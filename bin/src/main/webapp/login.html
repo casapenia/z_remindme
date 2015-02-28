@@ -1,0 +1,51 @@
+<!doctype>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Remind Me2 - Your personal notes everywhere</title>
+	<link rel="stylesheet" type="text/css" href="css/estilo.css"></style>
+	  <script type="text/javascript"  src='javascript/validaciones_generales.js'> </script>
+      <script type="text/javascript"  src='javascript/configuration.js'> </script>
+      <script type="text/javascript"  src='javascript/usuario_contraseña.js'> </script>
+      <script type="text/javascript"  src='javascript/contadores.js'> </script>
+		
+    </head>
+    <body>
+	<div id="mainContent">
+		<table>
+			<thead>
+				<tr>
+				<th><h1>RemindMe</h1></th>
+				</tr>
+			</thead>
+			<tr>
+				<!-- contenido info-->
+				<td style="float:left;padding-top: 50px;">
+					<ul>
+						<li type="square">Save your personal notes.</li>
+						<li type="square">See your notes everywhere.</li>
+						<li type="square">Share your notes with friends.</li>
+					</ul>
+				</td>
+				<!-- Formulario -->
+				<td style="float:right;padding-top: 50px;padding-left: 50px;" >
+					<form action="/services/login" method="POST" id="loginForm">
+						<label for="userName">Username:</label>
+						<input type="text" id="userName" name="userName" onfocus="this.style.backgroundColor=campoColorValido" onblur="this.style.backgroundColor=campoColorValido"/>
+						<br>
+						<label for="userPassword">Password:</label>
+						<input type="text" id="userPassword" name="userPassword" onfocus="this.style.backgroundColor=campoColorValido" onblur="this.style.backgroundColor=campoColorValido"/>
+						<br>
+						<input type="submit" value="Login" style="float:right;" onclick="javascript:validacioneGenerales();"/>
+						<input type="button" value="Valida"  onclick="javascript:validacioneGenerales()"  style="float:right;"/>
+						<br>
+						<a href="createUser.html" style="float: right;">Registrarse</a>
+					</form>
+					
+				</td>
+			</tr>
+		</table>
+	</div>
+		
+    </body>
+</html>

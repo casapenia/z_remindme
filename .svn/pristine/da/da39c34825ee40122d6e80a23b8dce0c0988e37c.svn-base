@@ -1,0 +1,21 @@
+#mainContent{
+         	display:block;
+         	width: 600px;
+         	height: 400px;
+         	position:absolute;
+         	top:50%;
+         	left:50%;
+         	margin-top:-200px;
+         	margin-left:-300px;
+         }
+         input{
+         	margin-top:5px;
+         	padding-left:2px;
+         	aling:right;
+         	size:28;
+         }
+         select{
+         	margin-top: 5px;
+         }
+         label {display: inline-block; width: 140px; text-align: right;}
+

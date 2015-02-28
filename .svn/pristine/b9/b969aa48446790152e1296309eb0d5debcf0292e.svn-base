@@ -1,0 +1,179 @@
+package com.dppware.remindme.dao;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.dppware.remindme.bussines.dto.GenericDto;
+import com.dppware.remindme.bussines.dto.UserDto;
+import com.dppware.remindme.dao.utils.PMF;
+import com.dppware.remindme.utils.JSONUtils;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Query;
+
+import flexjson.JSONDeserializer;
+
+public class UserDao implements IGenericDao{
+
+	public final String KIND= "UserDto";
+	public final String STORENAME= "Users";
+
+	@Override
+	public UserDto get(String key) {
+//		List<Object> z = (List<Object>)PMF.get().getPersistenceManager().getManagedObjects();
+//		System.out.println("y hat "+z.size() +" elementos persistidos ");
+//		for (Object o : z){
+//			System.out.println("objeto "+o.getClass());
+//		}
+		
+				//.getObjectById(new Long(Integer.parseInt(key)));
+		Entity u = null;
+		
+		//Crea la key
+		Key userKey = KeyFactory.createKey(KIND, new Long(Integer.parseInt(key)));
+		
+		
+			System.out.println("buscando usuario con key ="+userKey);
+			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+			Query query = new Query(STORENAME, userKey);
+			
+			Entity user = datastore.prepare(query).asSingleEntity();
+		if(user== null){
+			return null;
+		}
+		System.out.println("EL VALOR DE User ES "+user);
+		JSONDeserializer de  = JSONUtils.getDeSerializer();
+		String data = (String)user.getProperty("data");
+		UserDto retur = (UserDto)de.deserialize(data, UserDto.class);
+		return retur;
+	}
+	
+	
+	@Override
+	public List getAll() {
+		List<UserDto> result = new ArrayList<UserDto>();
+		
+		//Crea la key
+		
+		System.out.println("buscando usuario todos los UserDtos ");
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		Query query = new Query(STORENAME);
+		List<Entity> users = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5));
+		System.out.println("hay un total de "+users.size()+" usuarios.");
+		return getFromEntityList(users);
+	}
+	
+	
+	public void saveJDO(GenericDto e){
+		UserDto u = (UserDto)e;
+		UserDto a = PMF.get().getPersistenceManager().makePersistent(u);
+		System.out.println("el key es "+ u.getId());
+		PMF.get().getPersistenceManager().flush();	
+		
+		
+	}
+	
+
+	@Override
+	public void save(GenericDto e) {
+		
+//		PMF.get().getPersistenceManager().makePersistent(e);
+//		PMF.get().getPersistenceManager().flush();
+		Long id = 1L;
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		Query query = new Query(STORENAME);
+		List<Entity> users = datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
+		if(users != null && users.size()>0){
+			id = new Long(users.size());
+		}
+		
+		UserDto user = (UserDto)e;
+		user.setId(id);
+		System.out.println("lusuario que llega es "+user);
+		//Crea la key
+	    Key userKey = KeyFactory.createKey(KIND, user.getId());
+	    
+	    //Crea la entidad
+	    //1.establece la pk de la entity
+	    Entity userPersist = new Entity(STORENAME, userKey);
+	    //2.establece los datos
+	    userPersist.setProperty("data", JSONUtils.getSerializer().serialize(user));
+
+
+	    
+	    datastore.put(userPersist);
+	    
+	    
+	
+	}
+
+	@Override
+	public void update(GenericDto e) {
+		UserDto user = (UserDto)e;
+		UserDto _found = get(user.getId().toString());
+		
+		if(_found == null){
+			System.out.println("NO EXISTE EL REGISTRO");
+			
+		}else{
+			if(user.getBirthDay()!= null){
+				_found.setBirthDay(user.getBirthDay());
+			}
+			if(user.getLastName()!=null && !user.getLastName().equals("")){
+				_found.setLastName(user.getLastName());
+			}
+			if(user.getName()!=null && !user.getName().equals("")){
+				_found.setName(user.getName());
+			}
+			if(user.getPassword()!= null && !user.getPassword().equals("")){
+				_found.setPassword(user.getPassword());
+			}
+			if(user.getUserName()!=null && !user.getUserName().equals("")){
+				_found.setUserName(user.getUserName());
+			}
+		}
+		
+		
+		save(_found);
+		
+	    System.out.println("Update finalizado");
+		
+	}
+
+	@Override
+	public void delete(String key) {
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		
+		Key userKey = KeyFactory.createKey(KIND, new Long(Integer.parseInt(key)));
+		
+		
+		System.out.println("buscando usuario con key ="+userKey);
+		
+		Query query = new Query(STORENAME, userKey);
+		
+		Entity user = datastore.prepare(query).asSingleEntity();
+		System.out.println("borrando usuario con key ="+user.getKey());
+		datastore.delete(user.getKey());
+		
+	}
+
+	private UserDto getFromEntity(Entity user){
+		JSONDeserializer de  = JSONUtils.getDeSerializer();
+		String data = (String)user.getProperty("data");
+		UserDto retur = (UserDto)de.deserialize(data, UserDto.class);
+		return retur;
+	}
+
+	private List getFromEntityList(List<Entity> users){
+		List<UserDto> result = new ArrayList<UserDto>();
+		for(Entity e: users){
+			result.add(getFromEntity(e));
+		}
+		
+		return result;
+	}
+}

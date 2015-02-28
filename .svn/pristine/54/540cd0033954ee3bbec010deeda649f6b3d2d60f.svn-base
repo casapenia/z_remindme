@@ -1,0 +1,5 @@
+package com.dppware.remindme.bussines.dto;
+
+public class GenericDto {
+
+}

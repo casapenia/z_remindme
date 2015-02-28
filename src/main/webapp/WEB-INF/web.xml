@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app
+        version="2.5"
+        xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    
+    <!-- Filtros login -->
+    <servlet>
+        <servlet-name>LoginRequiredServlet</servlet-name>
+        <servlet-class>com.dppware.remindme.facade.filter.LoginRequiredServlet</servlet-class>
+    </servlet>
+    
+        <!--SErvlet de JAx RS jersey-->
+    <servlet> <!-- aqui hay documentacion http://www.vogella.de/articles/REST/article.html -->
+        <servlet-name>Jersey REST Service</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+		          <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
+		          <param-value>com.sun.jersey.api.core.PackagesResourceConfig</param-value>
+		      </init-param>
+		      <init-param>
+		         <param-name>com.sun.jersey.config.property.packages</param-name>
+		         <param-value>com.dppware.remindme.facade</param-value>
+		      </init-param>
+		      <init-param>
+		           <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+		         <param-value>true</param-value>
+		    </init-param>
+		    <init-param>
+		    <param-name>com.sun.jersey.config.feature.DisableWADL</param-name>
+		    <param-value>true</param-value>
+		</init-param>
+        <!-- Le dice cual es el directorio raiz de las jsp, por si se devuleve por viewable-->
+        <init-param>
+            <param-name>com.sun.jersey.config.property.JSPTemplatesBasePath</param-name>
+            <param-value>/WEB-INF/jsp</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    
+    
+    
+    
+     <servlet-mapping>
+        <servlet-name>LoginRequiredServlet</servlet-name>
+        <url-pattern>/admin</url-pattern>
+    </servlet-mapping>
+    
+
+    
+    
+    <servlet-mapping>
+        <servlet-name>Jersey REST Service</servlet-name>
+        <url-pattern>/services/*</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+    
+<!--     <security-constraint>
+	    <web-resource-collection>
+	    	<web-resource-name>Admin Resources</web-resource-name>
+	    	<url-pattern>.*</url-pattern>
+	    </web-resource-collection>
+	    <auth-constraint>
+	        <role-name>*</role-name>
+	    </auth-constraint>
+	</security-constraint> -->
+</web-app>

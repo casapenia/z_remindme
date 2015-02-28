@@ -1,0 +1,21 @@
+package com.dppware.remindme.utils;
+
+import flexjson.JSONDeserializer;
+import flexjson.JSONSerializer;
+
+public final class JSONUtils {
+	
+	private static final JSONSerializer jsonSerializer = new JSONSerializer();
+	private static final JSONDeserializer jsonDeSerializer = new JSONDeserializer();
+
+	public JSONUtils() {
+	}
+
+	public static JSONSerializer getSerializer() {
+		return jsonSerializer;
+	}
+	public static JSONDeserializer getDeSerializer() {
+		return jsonDeSerializer;
+	}
+
+}

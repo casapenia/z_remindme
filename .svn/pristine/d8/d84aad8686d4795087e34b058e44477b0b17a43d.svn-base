@@ -1,0 +1,46 @@
+package com.dppware.remindme.dao;
+
+import java.util.List;
+import java.util.Set;
+
+import javax.jdo.Query;
+
+import com.dppware.remindme.bussines.dto.GenericDto;
+import com.dppware.remindme.bussines.dto.UserDto;
+import com.dppware.remindme.dao.utils.PMF;
+
+public class UserJDO {
+	public void save(GenericDto e){
+		UserDto u = (UserDto)e;
+		UserDto a = PMF.get().getPersistenceManager().makePersistent(u);
+		System.out.println("el key es "+ u.getId());
+		PMF.get().getPersistenceManager().flush();	
+		
+		
+	}
+	
+	public UserDto get(String id){
+		UserDto u = PMF.get().getPersistenceManager().getObjectById(UserDto.class, new Long(id));
+		return u;
+		
+	}
+
+	public List<UserDto> getAll(){
+		Set<UserDto> u = PMF.get().getPersistenceManager().getManagedObjects(UserDto.class);
+		Query q = PMF.get().getPersistenceManager().newQuery(UserDto.class);
+		return (List<UserDto>)q.execute();
+		
+		
+	}
+	
+	public void update(GenericDto o){
+		
+	}
+	public void remove(String userId){
+		
+	}
+	
+public void delete(String userId){
+		
+	}
+}

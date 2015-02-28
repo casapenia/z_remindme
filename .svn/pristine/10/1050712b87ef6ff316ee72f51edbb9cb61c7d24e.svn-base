@@ -1,0 +1,213 @@
+package com.dppware.remindme.facade;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
+import com.dppware.remindme.bussines.UserService;
+import com.dppware.remindme.bussines.dto.UserDto;
+
+import flexjson.JSONSerializer;
+
+@Path("/user")
+public class UserFacade {
+
+	
+	/**
+	 * DEvuleve todos los usuarios
+	 * @return
+	 */
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+    public Response getAll() {
+	    System.out.println("Buscando todos los usuarios");
+	    
+	    
+	    List<UserDto> user = new UserService().getAll();
+	    
+	    
+	    JSONSerializer serializer = new JSONSerializer();
+	    String result =  serializer.serialize(user);
+	    
+	    return Response.ok(result).build();
+    }
+	
+	/**
+	 * Devuelve los datos de un usuario
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+    public Response get(@PathParam("id") String id) {
+	    System.out.println("Buscando usuario con id "+id);
+	    //String id = "marquitosBreiker";
+	    
+	    UserDto user = new UserService().get(id);
+	    
+	    if(user==null){
+	    	return Response.ok("No se encuentra ese usuario con id "+ id).build();
+	    }
+	    JSONSerializer serializer = new JSONSerializer();
+	    String result =  serializer.serialize(user);
+	    
+	    return Response.ok(result).build();
+    }
+	
+	
+	/**
+	 * Crea un usuario
+	 * @param inFormParams
+	 * @param formFieldName
+	 * @return
+	 */
+	@POST
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces(MediaType.APPLICATION_JSON)
+    public Response save(MultivaluedMap<String, String> inFormParams ,@FormParam("name") String formFieldName) {
+		if(validateFormCreateUser(inFormParams) != null){
+			return Response.status(Status.BAD_REQUEST).entity(validateFormCreateUser(inFormParams)).build();
+		}
+	    System.out.println("GUARDANDO USUARIO");
+	    UserDto user = new UserDto();
+	    user.setAdmin(inFormParams.getFirst("userType").equalsIgnoreCase("A")?true:false);
+	    
+	    user.setBirthDay(new Date(
+	    							Integer.parseInt(inFormParams.getFirst("birthYear")),
+	    							Integer.parseInt(inFormParams.getFirst("birthMonth")),
+	    							Integer.parseInt(inFormParams.getFirst("birthDay"))));
+	    user.setLastName(inFormParams.getFirst("lastName"));
+	    user.setName(inFormParams.getFirst("name"));
+	    user.setPassword(inFormParams.getFirst("userPassword"));
+	    user.setRegistrationDate(new Date());
+	    user.setUserName(inFormParams.getFirst("userName"));
+	    
+	    new UserService().save(user);
+	    
+	    
+	    JSONSerializer serializer = new JSONSerializer();
+	    String result =  serializer.serialize(user  );
+	    
+	    return Response.ok(result).build();
+    }
+	
+	/**
+	 * Borra un usuario
+	 * @param id
+	 * @return
+	 */
+	@DELETE
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+    public Response removeUser(@PathParam("id") String id) {
+	    System.out.println("Buscando usuario con id "+id);
+	    //String id = "marquitosBreiker";
+	    
+	    new UserService().remove(id);
+	    
+	    
+	    return Response.ok("Usuario borrado correctamente").build();
+    }
+	
+	@PUT
+	@Path("/{id}")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces(MediaType.APPLICATION_JSON)
+    public Response update(@PathParam("id") String id, MultivaluedMap<String, String> inFormParams ) {
+
+	    System.out.println("Actualizando USUARIO");
+	    UserDto user = new UserDto();
+	    //Creo la representacion del objetoa modificar
+	    user.setId(new Long(id));
+	    
+	    if(inFormParams.getFirst("userType") != null){
+	    	user.setAdmin(inFormParams.getFirst("userType").equalsIgnoreCase("A")?true:false);
+	    }
+	    if(inFormParams.getFirst("birthYear")!= null &&
+	    		inFormParams.getFirst("birthMonth")	!=null &&
+	    		inFormParams.getFirst("birthDay")!=null){
+	    	
+		    user.setBirthDay(new Date(
+		    							Integer.parseInt(inFormParams.getFirst("birthYear")),
+		    							Integer.parseInt(inFormParams.getFirst("birthMonth")),
+		    							Integer.parseInt(inFormParams.getFirst("birthDay"))));
+	    }
+	    if(inFormParams.getFirst("lastName")!=null){
+	    	user.setLastName(inFormParams.getFirst("lastName"));
+	    }
+	    if(inFormParams.getFirst("name")!=null){
+	    	user.setName(inFormParams.getFirst("name"));
+	    }
+	    if(inFormParams.getFirst("userPassword")!=null){
+	    	user.setPassword(inFormParams.getFirst("userPassword"));
+	    }
+	    
+	    if(inFormParams.getFirst("userName")!=null){
+	    	user.setUserName(inFormParams.getFirst("userName"));
+	    }
+	    new UserService().update(user);
+	    
+	    
+	    
+	    return get(user.getId().toString());
+	    
+    }
+	
+	
+	/**
+	 * validaciones del formulario de creacion de usuario
+	 * @param inFormParams
+	 * @return
+	 */
+	private String validateFormCreateUser(MultivaluedMap<String, String> inFormParams){
+		String errorMessage = null;
+		try{
+			for(String field :inFormParams.keySet()){
+				System.out.println("validando el campo :"+field);
+				if(inFormParams.getFirst(field) == null || inFormParams.getFirst(field).equals("")){
+					errorMessage = "El campo "+field+" no puede estar vacio";
+					System.out.println("HA HABIDO ERROR!! "+ errorMessage);
+					break;
+				}
+				System.out.println(2);
+				if(field.equals("userPasswordRepeat")){
+					System.out.println("comparando los campos userPasswordRepeat y userPassword");
+					System.out.println(inFormParams.getFirst("userPasswordRepeat") +" ?= "+inFormParams.getFirst("userPassword"));
+					if(!inFormParams.getFirst("userPasswordRepeat").equals(inFormParams.getFirst("userPassword"))){
+						errorMessage = "Los campos password no coinciden";
+						System.out.println("HA HABIDO ERROR!! "+ errorMessage);
+						break;
+					}
+				}
+				System.out.println(3);
+//				if(field.equals("name")||field.equals("lastName")){
+//					System.out.println("mirando si el campo "+field+ " ("+inFormParams.getFirst(field)+") es numerico y es "+inFormParams.getFirst(field).matches("[0-9]+") );
+//					if (inFormParams.getFirst(field).matches(".*[^0-9].*")) {
+//						errorMessage="El campo "+ field +" no puede contener numeros";
+//						System.out.println("HA HABIDO ERROR!! "+ errorMessage);
+//						break;
+//					}
+//				}
+			}
+			
+		}catch(Exception e){
+			errorMessage = "Ha habido un error en la validacion del formulario";
+		}
+		System.out.println("EL ERROR QUE DEVUELVO ES !! "+ errorMessage);
+		return errorMessage;
+	}
+}

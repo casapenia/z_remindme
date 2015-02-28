@@ -1,0 +1,15 @@
+package com.dppware.remindme.dao;
+
+import java.util.List;
+
+import com.dppware.remindme.bussines.dto.GenericDto;
+
+public interface IGenericDao {
+
+	public GenericDto get(String key);
+	public List<GenericDto> getAll();
+	public void save(GenericDto e);
+	public void update(GenericDto e);
+	public void delete(String id);
+	
+}

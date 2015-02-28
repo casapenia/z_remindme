@@ -1,0 +1,106 @@
+package com.dppware.remindme.bussines;
+
+import java.util.List;
+
+import com.dppware.remindme.bussines.dto.UserDto;
+import com.dppware.remindme.dao.UserDao;
+import com.dppware.remindme.dao.UserJDO;
+
+/**
+ * Servicio para manejar info de users
+ * @author florencia
+ *
+ */
+public class UserService {
+	
+	//UserDao dao = new UserDao();
+	UserJDO dao = new UserJDO();
+	
+	public UserDto save(UserDto user){
+
+		dao.save(user);	    
+		
+	    
+		return user;
+	}
+	
+	public UserDto get(String userId){
+
+		UserDto user = dao.get(userId);	    
+		
+	    
+		return user;
+	}
+
+	public void remove(String userId){
+
+		dao.delete(userId);	    
+		
+	    
+	}
+
+	public void update(UserDto user){
+
+		dao.update(user);	    
+		
+	    
+	}
+	public List getAll(){
+
+		List users = dao.getAll();	    
+		
+	    
+		return users;
+	}
+	
+	public UserDto validateUser(String userId, String userPassword){
+		try{
+			UserDto user = new UserDao().get(userId);
+			if(user.getPassword().equals(userPassword)){
+				return user;
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
+		
+		return null;
+	}
+/*
+ * 	public UserDto save(UserDto user){
+		//PersistenceManager pm = PMF.get().getPersistenceManager();
+	    //Key neocallcenterpdiKey = KeyFactory.createKey("Guestbook", neocallcenterpdiName);
+	    //String content = req.getParameter("content");
+	    //Date date = new Date();
+	    //Entity greeting = new Entity("Greeting", neocallcenterpdiKey);
+	    //greeting.setProperty("user", user);
+	    //greeting.setProperty("date", date);
+	    //greeting.setProperty("content", content);
+
+	    //DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	    //datastore.put(greeting);
+	    
+		
+		final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		//datastore.put(user);
+		
+		//Aqui esta como persistir
+		//http://googcloudlabs.appspot.com/codelabexercise1.html
+	    PersistenceManager pm = PMF.get().getPersistenceManager();
+
+	    
+	    
+        //Employee e = new Employee("Alfred", "Smith", new Date());
+
+        try {
+            UserDto u = pm.makePersistent(user);
+        } finally {
+            pm.close();
+        }
+	    
+	    
+	    
+		return user;
+	}
+ */
+}
